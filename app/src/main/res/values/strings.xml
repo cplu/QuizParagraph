@@ -2,4 +2,27 @@
 	<string name="app_name">QuizParagraph</string>
 	<string name="input_phrase">输入单词或短语</string>
 	<string name="add_phrase">添加</string>
+
+	<string-array name="default_phrase">
+		<item>Coherence</item>
+		<item>is</item>
+		<item>the trait</item>
+		<item>that</item>
+		<item>makes</item>
+		<item>the paragraph</item>
+		<item>easily</item>
+		<item>understandable</item>
+		<item>to a reader.</item>
+		<item>You</item>
+		<item>can</item>
+		<item>help</item>
+		<item>create</item>
+		<item>coherence</item>
+		<item>in your paragraphs</item>
+		<item>by</item>
+		<item>creating</item>
+		<item>logical bridges</item>
+		<item>and</item>
+		<item>verbal bridges.</item>
+	</string-array>
 </resources>

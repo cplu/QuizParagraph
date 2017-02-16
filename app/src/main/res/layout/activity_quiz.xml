@@ -16,24 +16,20 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:hint="@string/input_phrase"/>
+
 	<Button
 		android:id="@+id/btn_add_phrase_main"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="@string/add_phrase"
-		android:layout_below="@id/edit_input_phrase_main"/>
-	<ScrollView
+		android:layout_below="@id/edit_input_phrase_main"
+		android:text="@string/add_phrase"/>
+
+	<RelativeLayout
+		android:id="@+id/layout_paragraph_main"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/btn_add_phrase_main">
-		<RelativeLayout
-			android:id="@+id/layout_paragraph_main"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_marginLeft="@dimen/layout_quiz_horizontal_margin"
-			android:layout_marginRight="@dimen/layout_quiz_horizontal_margin"
-			android:paddingLeft="0dp"
-			android:paddingRight="0dp">
-		</RelativeLayout>
-	</ScrollView>
+		android:layout_below="@id/btn_add_phrase_main"
+		android:layout_margin="0dp"
+		android:padding="0dp">
+	</RelativeLayout>
 </RelativeLayout>

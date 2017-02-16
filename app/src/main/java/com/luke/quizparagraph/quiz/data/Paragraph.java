@@ -1,9 +1,7 @@
 package com.luke.quizparagraph.quiz.data;
 
-import android.graphics.Paint;
-import android.text.TextUtils;
+import android.graphics.PointF;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,11 +9,11 @@ import java.util.List;
  */
 
 public class Paragraph {
-	private static final String SPACE_STRING = " ";
 	private final int m_lineWidth;
 	/**
 	 * Containing all phrases in paragraph.
-	 * Two members of Pair are: length of phrase and word set of phrase
+	 * Map original index to a Phrase.
+	 * Original index is passed in through constructor as an input
 	 */
 	private List<Phrase> m_phraseParagraph;
 
@@ -24,39 +22,18 @@ public class Paragraph {
 	 *
 	 * @param phraseList
 	 * @param lineWidth  line width limit, which is shown in the view, in pixel
-	 * @param paint      paint used to measure text width
 	 */
-	public Paragraph(List<String> phraseList, int lineWidth, Paint paint) {
-		m_phraseParagraph = new ArrayList<>();
-		/// iterate by index, because we need index to keep original indexes
-		for (int i = 0; i < phraseList.size(); i++) {
-			if (!TextUtils.isEmpty(phraseList.get(i))) {
-				String[] wordStringSet = phraseList.get(i).split(" +");
-				List<Word> wordSet = createWordSetByStringSet(wordStringSet, paint);
-				m_phraseParagraph.add(new Phrase(i, wordSet));
-			} else {
-				/// invalid input string (empty or null), should bypass, meaning that index in m_phraseParagraph needn't be consecutive
-			}
-		}
+	public Paragraph(List<Phrase> phraseList, int lineWidth) {
+		m_phraseParagraph = phraseList;
 		m_lineWidth = lineWidth;
 	}
 
-	private List<Word> createWordSetByStringSet(String[] wordStringSet, Paint paint) {
-		List<Word> wordList = new ArrayList<>();
-		for (String wordString : wordStringSet) {
-			Word word = new Word(wordString, (int) Math.ceil(paint.measureText(wordString + SPACE_STRING)));
-			wordList.add(word);
-		}
-		return wordList;
-	}
-
 	/**
-	 * parse the current paragraph and return current sequence with line separator
-	 * depending on line width
+	 * parse the current paragraph and return current phrase list as a paragraph
 	 *
 	 * @return
 	 */
-	public List<Phrase> parseCurrent() {
+	public List<Phrase> parseCurrentParagraph() {
 		int width = 0; /// total width of current line
 		int linenumber = 0;
 		for (Phrase phrase : m_phraseParagraph) {
@@ -73,5 +50,26 @@ public class Paragraph {
 			}
 		}
 		return m_phraseParagraph;
+	}
+
+	/**
+	 * remove a phrase by index and return what is removed as a SimpleEntry
+	 *
+	 * @param phraseIndexToMove
+	 * @return
+	 */
+	public Phrase removePhrase(int phraseIndexToMove) {
+		/// remove the selected one
+		Phrase phraseToMove = m_phraseParagraph.remove(phraseIndexToMove);
+		return phraseToMove;
+	}
+
+	public Phrase removePhraseByPosition(float x, float y, PointF outRelative) {
+		for (int i = 0; i < m_phraseParagraph.size(); i++) {
+			if (m_phraseParagraph.get(i).contains(x, y, outRelative)) {
+				return m_phraseParagraph.remove(i);
+			}
+		}
+		return null;
 	}
 }

@@ -3,4 +3,8 @@
 	<color name="colorPrimary">#3F51B5</color>
 	<color name="colorPrimaryDark">#303F9F</color>
 	<color name="colorAccent">#FF4081</color>
+	<color name="default_blue">#FF0095FF</color>
+	<color name="text_phrase_selected">#EEEEEE</color>
+	<color name="default_green">#FF81BA38</color>
+	<color name="text_phrase_normal">#FFFFFF</color>
 </resources>
