@@ -1,0 +1,5 @@
+<resources>
+	<string name="app_name">QuizParagraph</string>
+	<string name="input_phrase">输入单词或短语</string>
+	<string name="add_phrase">添加</string>
+</resources>
