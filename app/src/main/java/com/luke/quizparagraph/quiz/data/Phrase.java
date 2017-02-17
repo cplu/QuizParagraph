@@ -15,7 +15,7 @@ public class Phrase {
 	public static final int LINE_HEIGHT = Common.dp2px(40);
 	//	public static final int SPACE_LENGTH = 1;
 	public static final int NO_SEPARATING = -1;
-	private static final float POINT_NEAR_LIMIT = Common.dp2px(6);
+	private static final float POINT_NEAR_LIMIT = Common.dp2px(10);
 //	public static final int PHRASE_LENGTH_LIMIT = 28;
 	private final int m_originalIndex;  /// original index in input List<String>
 	private final int m_width;         /// width of this phrase
