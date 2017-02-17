@@ -251,4 +251,14 @@ public class Phrase {
 				m_columnPosition + m_width, m_lineNumber * LINE_HEIGHT);
 		}
 	}
+
+	/**
+	 * check if this phrase is above (x,y)
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean above(float x, float y) {
+		return y > (m_lineNumber + 1) * LINE_HEIGHT;
+	}
 }

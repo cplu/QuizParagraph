@@ -127,12 +127,12 @@ public class Paragraph {
 //				Logger.debug("find new index " + newIndex);
 			}
 		}
-//		if(newIndex == -1) {
-//			/// try to add to the last position
-//			if(m_phraseParagraph.getLast().isLeftTo(x, y)) {
-//
-//			}
-//		}
+		if(newIndex == -1) {
+			/// try to add to the last position
+			if(m_phraseParagraph.getLast().above(x, y)) {
+				newIndex = m_phraseParagraph.size();
+			}
+		}
 
 		if (oldIndex > 0 && oldIndex == newIndex) {
 			/// the same index, no need to move
