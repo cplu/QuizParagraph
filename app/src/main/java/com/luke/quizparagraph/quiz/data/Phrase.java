@@ -1,6 +1,7 @@
 package com.luke.quizparagraph.quiz.data;
 
 import android.graphics.PointF;
+import android.support.annotation.NonNull;
 
 import com.luke.quizparagraph.util.Common;
 
@@ -16,7 +17,7 @@ public class Phrase {
 	//	public static final int SPACE_LENGTH = 1;
 	public static final int NO_SEPARATING = -1;
 	private static final float POINT_NEAR_LIMIT = Common.dp2px(10);
-//	public static final int PHRASE_LENGTH_LIMIT = 28;
+	//	public static final int PHRASE_LENGTH_LIMIT = 28;
 	private final int m_originalIndex;  /// original index in input List<String>
 	private final int m_width;         /// width of this phrase
 	private final List<Word> m_wordSet;   /// word set of this phrase
@@ -93,7 +94,7 @@ public class Phrase {
 			/// this means the phrase is separated before the first word, so actually it should be moved to a new line
 			m_columnPosition = 0;
 			m_lineNumber = lineNumber + 1;
-			m_separatingPosition = NO_SEPARATING;
+			resetSeparatingPosition();
 		} else {
 			m_lineNumber = lineNumber;
 		}
@@ -182,7 +183,7 @@ public class Phrase {
 	 * @param outRelative
 	 * @return
 	 */
-	public boolean contains(float x, float y, PointF outRelative) {
+	public boolean contains(float x, float y, @NonNull PointF outRelative) {
 		if (m_separatingPosition != NO_SEPARATING) {
 			/// check if in the remaining part if separating exists
 			if (x >= 0 && x < m_remainingWidth
@@ -227,5 +228,27 @@ public class Phrase {
 
 	public String getOriginalString() {
 		return m_originalString;
+	}
+
+	/**
+	 * return if Phrase's right-top corner is near (x, y)
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean toLeftOf(float x, float y) {
+		if (m_separatingPosition != NO_SEPARATING) {
+			/// check if in the remaining part if separating exists
+			if (isPointNear(x, y,
+				m_remainingWidth, (m_lineNumber + 1) * LINE_HEIGHT)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return isPointNear(x, y,
+				m_columnPosition + m_width, m_lineNumber * LINE_HEIGHT);
+		}
 	}
 }

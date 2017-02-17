@@ -10,6 +10,7 @@ import com.luke.quizparagraph.quiz.data.Phrase;
 import com.luke.quizparagraph.quiz.data.Word;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -120,12 +121,17 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 	 * @param paint
 	 * @return true if successfull, false otherwise
 	 */
-	public boolean addPhrase(String phraseString, Paint paint, int lineWidth) {
+	public boolean addPhrase(String phraseString, int phraseIndex, Paint paint, int lineWidth) {
+		if(m_paragraph.isEmpty()) {
+			List<String> phraseStringList = new ArrayList<>(Arrays.asList(phraseString));
+			parseNewParagraph(phraseStringList, lineWidth, paint);
+			return true;
+		}
 		phraseString = phraseString.trim();
 		if (!TextUtils.isEmpty(phraseString) && paint.measureText(phraseString) < lineWidth) {
 			List<Word> wordSet = createWordSetByStringSet(phraseString, paint);
-			int phraseCount = m_paragraph.getPhraseCount();
-			Phrase phrase = new Phrase(phraseString, phraseCount, wordSet);
+//			int phraseCount = m_paragraph.getPhraseCount();
+			Phrase phrase = new Phrase(phraseString, phraseIndex, wordSet);
 			m_paragraph.addPhrase(phrase);
 			getView().notifyPhraseAdded(phrase);
 			return true;

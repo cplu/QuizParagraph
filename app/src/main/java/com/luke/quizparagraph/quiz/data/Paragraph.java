@@ -114,11 +114,17 @@ public class Paragraph {
 		int oldIndex = -1;  /// store index of phraseToMove
 		int newIndex = -1;  /// store index of insertion
 		for (int i = 0; i < m_phraseParagraph.size(); i++) {
-			if (phraseToMove == m_phraseParagraph.get(i)) {
+			Phrase phrase = m_phraseParagraph.get(i);
+			if (phraseToMove == phrase) {
 				oldIndex = i;
 			}
-			if (m_phraseParagraph.get(i).isAttachedTo(x, y)) {
+			if (phrase.toLeftOf(x, y)) {  /// current phrase is at the left of (x,y)
+				newIndex = i + 1;
+//				Logger.debug("find new index " + newIndex);
+			} else if(phrase.getColumnPosition() == 0
+				&& phrase.contains(x,y, new PointF())) {  /// current phrase is near (x, y), this is only checked when column is 0
 				newIndex = i;
+//				Logger.debug("find new index " + newIndex);
 			}
 		}
 //		if(newIndex == -1) {
@@ -181,5 +187,9 @@ public class Paragraph {
 
 	public int getPhraseCount() {
 		return m_phraseParagraph.size();
+	}
+
+	public boolean isEmpty() {
+		return m_phraseParagraph.isEmpty();
 	}
 }
