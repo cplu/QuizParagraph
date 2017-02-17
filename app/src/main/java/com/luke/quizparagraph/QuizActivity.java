@@ -79,6 +79,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 				Common.showToast(getString(R.string.phrase_too_long));
 			}
 		}
+		m_editNewPhrase.setText(null);
 	}
 
 	private PointF m_selectedPhrasePosRelativeToTouch = new PointF();
