@@ -200,25 +200,26 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 			}
 			AnimatorSet phraseAnimator = AnimatorTool.getDefaultAnimator(separatorViews[0], columnPosition,
 				lineNumber * Phrase.LINE_HEIGHT);
-			if (phraseAnimator != null) {    /// this checks if animator is necessary
+			if (phraseAnimator != null && !dotty) {    /// this checks if animator is necessary, dotty view doesn't need animator
 				phraseAnimator.start();
 				AnimatorTool.getDefaultAnimator(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT)
 					.start();
 			} else {
+				separatorViews[0].setX(columnPosition);
+				separatorViews[0].setY(lineNumber * Phrase.LINE_HEIGHT);
 				separatorViews[1].setX(0);
 				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
 			}
-//				separatorViews[0].setX(columnPosition);
-//				separatorViews[0].setY(lineNumber * Phrase.LINE_HEIGHT);
-//				separatorViews[1].setX(0);
-//				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
 		} else {
 			/// no line separator
 			textViewAccordingly.clearSeparatorViews(m_layoutParagraph);
 			textViewAccordingly.setVisibility(View.VISIBLE);
-			AnimatorTool.startPhraseViewAnimator(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
-//				textViewAccordingly.setX(columnPosition);
-//				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
+			if (!dotty) {   // dotty view doesn't need animator
+				AnimatorTool.startPhraseViewAnimator(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
+			} else {
+				textViewAccordingly.setX(columnPosition);
+				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
+			}
 		}
 	}
 
