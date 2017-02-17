@@ -15,7 +15,8 @@
 		android:id="@+id/edit_input_phrase_main"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:hint="@string/input_phrase"/>
+		android:hint="@string/input_phrase"
+		android:singleLine="true"/>
 
 	<Button
 		android:id="@+id/btn_add_phrase_main"

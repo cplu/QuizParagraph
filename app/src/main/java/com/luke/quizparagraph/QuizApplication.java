@@ -3,6 +3,7 @@ package com.luke.quizparagraph;
 import android.app.Application;
 
 import com.luke.quizparagraph.logger.UnivLogger;
+import com.luke.quizparagraph.util.Common;
 
 /**
  * Created by cplu on 2015/10/22.
@@ -16,7 +17,10 @@ public class QuizApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
+		Common.init(this);
+
 		/// init logger level
 		UnivLogger.initLogger(this, BuildConfig.DEBUG);
+
 	}
 }

@@ -2,6 +2,8 @@
 	<string name="app_name">QuizParagraph</string>
 	<string name="input_phrase">输入单词或短语</string>
 	<string name="add_phrase">添加</string>
+	<string name="please_input_phrase">请输入短语</string>
+	<string name="phrase_too_long">短语太长，请重新输入</string>
 
 	<string-array name="default_phrase">
 		<item>Coherence</item>

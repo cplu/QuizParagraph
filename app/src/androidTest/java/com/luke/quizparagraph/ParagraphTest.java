@@ -29,7 +29,7 @@ public class ParagraphTest {
 	@Test
 	public void testParagraph() throws Exception {
 //		Context appContext = InstrumentationRegistry.getTargetContext();
-		TextView textView = (TextView) mActivityRule.getActivity().getLayoutInflater().inflate(R.layout.layout_phrase_text_view, null);
+		TextView textView = (TextView) mActivityRule.getActivity().getLayoutInflater().inflate(R.layout.layout_text_phrase_view, null);
 		Paint paint = textView.getPaint();
 
 

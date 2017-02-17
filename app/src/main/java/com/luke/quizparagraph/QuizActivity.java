@@ -3,8 +3,10 @@ package com.luke.quizparagraph;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -12,7 +14,9 @@ import com.luke.quizparagraph.customview.PhraseTextView;
 import com.luke.quizparagraph.mvp.MVPActivity;
 import com.luke.quizparagraph.mvp.presenter.QuizPresenter;
 import com.luke.quizparagraph.mvp.view.IQuizView;
+import com.luke.quizparagraph.quiz.anim.AnimatorTool;
 import com.luke.quizparagraph.quiz.data.Phrase;
+import com.luke.quizparagraph.util.Common;
 
 import org.pmw.tinylog.Logger;
 
@@ -30,6 +34,9 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 
 	@BindView(R.id.layout_paragraph_main)
 	RelativeLayout m_layoutParagraph;
+
+	@BindView(R.id.edit_input_phrase_main)
+	EditText m_editNewPhrase;
 
 	/**
 	 * list of TextViews to be used for moving and placing
@@ -64,7 +71,14 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 
 	@OnClick(R.id.btn_add_phrase_main)
 	public void onBtnAddPhraseClick() {
-
+		String phrase = m_editNewPhrase.getText().toString();
+		if(TextUtils.isEmpty(phrase)) {
+			Common.showToast(getString(R.string.please_input_phrase));
+		} else {
+			if(!m_presenter.addPhrase(phrase, m_txtPaint, m_layoutParagraph.getWidth())) {
+				Common.showToast(getString(R.string.phrase_too_long));
+			}
+		}
 	}
 
 	private PointF m_selectedPhrasePosRelativeToTouch = new PointF();
@@ -86,13 +100,20 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 				return true;
 			case MotionEvent.ACTION_MOVE:
 				if (m_textViewSelectedPhrase != null) {
-					m_textViewSelectedPhrase.setX(event.getX() - m_selectedPhrasePosRelativeToTouch.x);
-					m_textViewSelectedPhrase.setY(event.getY() - m_selectedPhrasePosRelativeToTouch.y);
+					float currentPhrasePositionX = event.getX() - m_selectedPhrasePosRelativeToTouch.x;
+					float currentPhrasePositionY = event.getY() - m_selectedPhrasePosRelativeToTouch.y;
+					m_textViewSelectedPhrase.setX(currentPhrasePositionX);
+					m_textViewSelectedPhrase.setY(currentPhrasePositionY);
+					m_presenter.movePhraseByPosition(currentPhrasePositionX, currentPhrasePositionY);
 				}
 				break;
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
-				clearPhraseSelected();
+				if (m_textViewSelectedPhrase != null) {
+					clearPhraseSelected();
+					m_textViewSelectedPhrase = null;
+					m_presenter.dockPhrase();
+				}
 				break;
 			default:
 				break;
@@ -103,7 +124,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 	private void clearPhraseSelected() {
 		if (m_textViewSelectedPhrase != null) {
 			m_textViewSelectedPhrase.setBackgroundResource(R.drawable.bg_text_phrase_normal);
-			m_textViewSelectedPhrase.setVisibility(View.GONE);
+//			m_textViewSelectedPhrase.setVisibility(View.GONE);
 		}
 	}
 
@@ -120,7 +141,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 			/// get corresponding TextView
 			PhraseTextView textViewAccordingly = m_phraseItemViews.get(phrase.getOriginalIndex());
 			/// check if is the selected one
-			if(textViewAccordingly == m_textViewSelectedPhrase) {
+			if (textViewAccordingly == m_textViewSelectedPhrase) {
 				/// do not change the selected phrase
 				continue;
 			}
@@ -131,23 +152,36 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 			if (separatorIndex != Phrase.NO_SEPARATING) {
 				/// line separator, create separator views and show
 				textViewAccordingly.setVisibility(View.GONE);
+				/// this is done before getting textViewAccordingly's position
 				TextView[] separatorViews = new TextView[]{
-					createDefaultTextView(),
-					createDefaultTextView()
+					createDefaultSeparatorView(textViewAccordingly),
+					createDefaultSeparatorView(textViewAccordingly)
 				};
+				/// although it is invisible, the position is useful for later animator
+				textViewAccordingly.setX(columnPosition);
+				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
 				textViewAccordingly.setSeparatorViews(m_layoutParagraph, Arrays.asList(separatorViews));
 				separatorViews[0].setText(phrase.getSeparatorString());
-				separatorViews[0].setX(columnPosition);
-				separatorViews[0].setY(lineNumber * Phrase.LINE_HEIGHT);
 				separatorViews[1].setText(phrase.getRemainingString());
-				separatorViews[1].setX(0);
-				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
+				separatorViews[1].setBackgroundResource(R.drawable.bg_text_separator_right);
+				if (AnimatorTool.animatePhraseView(separatorViews[0], columnPosition,
+					lineNumber * Phrase.LINE_HEIGHT)) {    /// this checks if animator is necessary
+					AnimatorTool.animatePhraseView(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT);
+				} else {
+					separatorViews[1].setX(0);
+					separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
+				}
+//				separatorViews[0].setX(columnPosition);
+//				separatorViews[0].setY(lineNumber * Phrase.LINE_HEIGHT);
+//				separatorViews[1].setX(0);
+//				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
 			} else {
 				/// no line separator
 				textViewAccordingly.clearSeparatorViews(m_layoutParagraph);
 				textViewAccordingly.setVisibility(View.VISIBLE);
-				textViewAccordingly.setX(columnPosition);
-				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
+				AnimatorTool.animatePhraseView(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
+//				textViewAccordingly.setX(columnPosition);
+//				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
 			}
 		}
 	}
@@ -175,10 +209,15 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 	}
 
 	private PhraseTextView createDefaultPhraseTextView() {
-		return (PhraseTextView) getLayoutInflater().inflate(R.layout.layout_phrase_text_view, m_layoutParagraph, false);
+		return (PhraseTextView) getLayoutInflater().inflate(R.layout.layout_text_phrase_view, m_layoutParagraph, false);
 	}
 
-	private TextView createDefaultTextView() {
-		return (TextView) getLayoutInflater().inflate(R.layout.layout_text_view, m_layoutParagraph, false);
+	private TextView createDefaultSeparatorView(PhraseTextView textViewAccordingly) {
+		TextView separatorView = (TextView) getLayoutInflater().inflate(R.layout.layout_text_phrase_part_view, m_layoutParagraph, false);
+		/// set original position to the same as its corresponding PhraseTextView
+		/// this is used when animator occurs
+		separatorView.setX(textViewAccordingly.getX());
+		separatorView.setY(textViewAccordingly.getY());
+		return separatorView;
 	}
 }

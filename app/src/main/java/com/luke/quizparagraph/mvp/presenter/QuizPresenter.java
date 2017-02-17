@@ -10,6 +10,7 @@ import com.luke.quizparagraph.quiz.data.Phrase;
 import com.luke.quizparagraph.quiz.data.Word;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,47 +18,82 @@ import java.util.List;
  */
 
 public class QuizPresenter extends ActivityPresenter<IQuizView> {
-	private Paragraph m_paragraph;
+	private Paragraph m_paragraph = new Paragraph();
 	private Phrase m_phraseToMove;   /// temporary phrase entry that is moving
+	private int m_indexFound = -1;
+//	private boolean m_phraseDeleted;    /// whether phrase to move has been deleted from m_paragraph
 
 	@Override
 	protected IQuizView createDummy() {
 		return IQuizView.dummy;
 	}
 
+	@Override
+	public void attach(IQuizView view) {
+		super.attach(view);
+	}
+
 	public List<Phrase> parseNewParagraph(List<String> phraseStringList, int lineWidth, Paint paint) {
-		List<Phrase> phraseList = generatePhraseList(phraseStringList, paint);
+		LinkedList<Phrase> phraseList = generatePhraseList(phraseStringList, paint, lineWidth);
 		m_paragraph = new Paragraph(phraseList, lineWidth);
-		List<Phrase> parsedResult = m_paragraph.parseCurrentParagraph();
-		getView().notifyPhraseResult(parsedResult);
+//		List<Phrase> parsedResult = m_paragraph.parseCurrentParagraph();
+		getView().notifyPhraseResult(m_paragraph.getPhraseList());
 		return phraseList;
 	}
 
 	/**
 	 * select a Phrase who contains (x, y)
-	 * @param x             x coordinate of touch point
-	 * @param y             y coordinate of touch point
-	 * @param outRelative   output the relative coordinates from (x, y) to the left-top corner of the Phrase
+	 *
+	 * @param x           x coordinate of touch point
+	 * @param y           y coordinate of touch point
+	 * @param outRelative output the relative coordinates from (x, y) to the left-top corner of the Phrase
 	 * @return
 	 */
 	public Phrase selectPhraseByPosition(float x, float y, PointF outRelative) {
-		m_phraseToMove = m_paragraph.removePhraseByPosition(x, y, outRelative);
-		if (m_phraseToMove != null) {
-			List<Phrase> parsedResult = m_paragraph.parseCurrentParagraph();
-			getView().notifyPhraseResult(parsedResult);
-		}
+		m_indexFound = m_paragraph.getPhraseByPosition(x, y, outRelative);
+		m_phraseToMove = m_paragraph.getPhraseByIndex(m_indexFound);
 		return m_phraseToMove;
 	}
 
-	private List<Phrase> generatePhraseList(List<String> phraseStringList, Paint paint) {
+	/**
+	 * move selected Phrase to position (x, y)
+	 *
+	 * @param x x coordinate of left-top corner of current phrase
+	 * @param y y coordinate of left-top corner of current phrase
+	 */
+	public void movePhraseByPosition(float x, float y) {
+		if (m_phraseToMove == null) {
+			return;
+		}
+		if (m_paragraph.movePhraseByPosition(x, y, m_phraseToMove)) {
+			getView().notifyPhraseResult(m_paragraph.getPhraseList());
+		}
+	}
 
-		List<Phrase> phraseList = new ArrayList<>();
+	/**
+	 * dock the current moving Phrase if exists
+	 * if no docking, fall back to the old position
+	 */
+	public void dockPhrase() {
+		if (m_phraseToMove == null) {
+			return;
+		}
+		if (m_indexFound >= 0) {
+			m_paragraph.assurePhraseExisted(m_phraseToMove, m_indexFound);
+			getView().notifyPhraseResult(m_paragraph.getPhraseList());
+			m_indexFound = -1;
+		}
+		m_phraseToMove = null;
+	}
+
+	private LinkedList<Phrase> generatePhraseList(List<String> phraseStringList, Paint paint, int lineWidth) {
+
+		LinkedList<Phrase> phraseList = new LinkedList<>();
 		/// iterate by index, we need to use index to keep original indexes
 		for (int i = 0; i < phraseStringList.size(); i++) {
-			if (!TextUtils.isEmpty(phraseStringList.get(i))) {
-
-				String[] wordStringSet = phraseStringList.get(i).split(" +");
-				List<Word> wordSet = createWordSetByStringSet(wordStringSet, paint);
+			String phraseString = phraseStringList.get(i);
+			if (!TextUtils.isEmpty(phraseString) && phraseString.length() <= lineWidth) {
+				List<Word> wordSet = createWordSetByStringSet(phraseString, paint);
 				phraseList.add(new Phrase(i, wordSet));
 			} else {
 				/// invalid input string (empty or null), should bypass, meaning that index in m_phraseParagraph needn't be consecutive
@@ -66,7 +102,8 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 		return phraseList;
 	}
 
-	private List<Word> createWordSetByStringSet(String[] wordStringSet, Paint paint) {
+	private List<Word> createWordSetByStringSet(String phraseString, Paint paint) {
+		String[] wordStringSet = phraseString.split(" +");
 		List<Word> wordList = new ArrayList<>();
 		for (String wordString : wordStringSet) {
 			Word word = new Word(wordString, (int) Math.ceil(paint.measureText(wordString + Phrase.SPACE_STRING)));
@@ -75,4 +112,22 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 		return wordList;
 	}
 
+	/**
+	 * add a new Phrase to the last of Paragraph
+	 *
+	 * @param phraseString
+	 * @param paint
+	 * @return true if successfull, false otherwise
+	 */
+	public boolean addPhrase(String phraseString, Paint paint, int lineWidth) {
+		if (!TextUtils.isEmpty(phraseString) && paint.measureText(phraseString) < lineWidth) {
+			List<Word> wordSet = createWordSetByStringSet(phraseString, paint);
+			int phraseCount = m_paragraph.getPhraseCount();
+			Phrase phrase = new Phrase(phraseCount, wordSet);
+			m_paragraph.addPhrase(phrase);
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

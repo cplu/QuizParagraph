@@ -2,6 +2,8 @@ package com.luke.quizparagraph.quiz.data;
 
 import android.graphics.PointF;
 
+import com.luke.quizparagraph.util.Common;
+
 import java.util.List;
 
 /**
@@ -10,9 +12,11 @@ import java.util.List;
 
 public class Phrase {
 	public static final String SPACE_STRING = " ";
-	public static final int LINE_HEIGHT = 100;
+	public static final int LINE_HEIGHT = Common.dp2px(40);
 	//	public static final int SPACE_LENGTH = 1;
 	public static final int NO_SEPARATING = -1;
+	private static final float POINT_NEAR_LIMIT = Common.dp2px(6);
+//	public static final int PHRASE_LENGTH_LIMIT = 28;
 	private final int m_originalIndex;  /// original index in input List<String>
 	private final int m_width;         /// width of this phrase
 	private final List<Word> m_wordSet;   /// word set of this phrase
@@ -168,6 +172,14 @@ public class Phrase {
 		return m_originalIndex;
 	}
 
+	/**
+	 * check if this Phrase contains (x, y), be careful to handle separating
+	 *
+	 * @param x
+	 * @param y
+	 * @param outRelative
+	 * @return
+	 */
 	public boolean contains(float x, float y, PointF outRelative) {
 		if (m_separatingPosition != NO_SEPARATING) {
 			/// check if in the remaining part if separating exists
@@ -192,5 +204,22 @@ public class Phrase {
 
 	public String getRemainingString() {
 		return m_remainingString;
+	}
+
+	/**
+	 * check if this Phrase's left-top corner is near (x, y)
+	 * Note that this only check the "first part" if separating exists
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean isAttachedTo(float x, float y) {
+		return isPointNear(x, y, m_columnPosition, m_lineNumber * LINE_HEIGHT);
+	}
+
+	private boolean isPointNear(float x1, float y1, float x2, float y2) {
+		return Math.abs(x1 - x2) < POINT_NEAR_LIMIT
+		       && Math.abs(y1 - y2) < POINT_NEAR_LIMIT;
 	}
 }
