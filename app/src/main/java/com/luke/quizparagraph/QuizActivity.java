@@ -71,7 +71,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 
 	@OnClick(R.id.btn_add_phrase_main)
 	public void onBtnAddPhraseClick() {
-		String phrase = m_editNewPhrase.getText().toString();
+		String phrase = m_editNewPhrase.getText().toString().trim();
 		if(TextUtils.isEmpty(phrase)) {
 			Common.showToast(getString(R.string.please_input_phrase));
 		} else {
@@ -145,44 +145,60 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 				/// do not change the selected phrase
 				continue;
 			}
-			/// get new position for this view
-			int lineNumber = phrase.getLineNumber();
-			int columnPosition = phrase.getColumnPosition();
-			int separatorIndex = phrase.getSeparatingPosition();
-			if (separatorIndex != Phrase.NO_SEPARATING) {
-				/// line separator, create separator views and show
-				textViewAccordingly.setVisibility(View.GONE);
-				/// this is done before getting textViewAccordingly's position
-				TextView[] separatorViews = new TextView[]{
-					createDefaultSeparatorView(textViewAccordingly),
-					createDefaultSeparatorView(textViewAccordingly)
-				};
-				/// although it is invisible, the position is useful for later animator
-				textViewAccordingly.setX(columnPosition);
-				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
-				textViewAccordingly.setSeparatorViews(m_layoutParagraph, Arrays.asList(separatorViews));
-				separatorViews[0].setText(phrase.getSeparatorString());
-				separatorViews[1].setText(phrase.getRemainingString());
-				separatorViews[1].setBackgroundResource(R.drawable.bg_text_separator_right);
-				if (AnimatorTool.animatePhraseView(separatorViews[0], columnPosition,
-					lineNumber * Phrase.LINE_HEIGHT)) {    /// this checks if animator is necessary
-					AnimatorTool.animatePhraseView(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT);
-				} else {
-					separatorViews[1].setX(0);
-					separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
-				}
+			drawPhraseTextView(textViewAccordingly, phrase);
+		}
+	}
+
+	@Override
+	public void notifyPhraseAdded(Phrase phrase) {
+		PhraseTextView txtView = createDefaultPhraseTextView();
+		if (m_txtPaint == null) {
+			m_txtPaint = txtView.getPaint();
+		}
+		txtView.setText(phrase.getOriginalString());
+		m_phraseItemViews.add(txtView);
+		m_layoutParagraph.addView(txtView);
+		drawPhraseTextView(txtView, phrase);
+	}
+
+	private void drawPhraseTextView(PhraseTextView textViewAccordingly, Phrase phrase) {
+		/// get new position for this view
+		int lineNumber = phrase.getLineNumber();
+		int columnPosition = phrase.getColumnPosition();
+		int separatorIndex = phrase.getSeparatingPosition();
+		if (separatorIndex != Phrase.NO_SEPARATING) {
+			/// line separator, create separator views and show
+			textViewAccordingly.setVisibility(View.GONE);
+			/// this is done before getting textViewAccordingly's position
+			TextView[] separatorViews = new TextView[]{
+				createDefaultSeparatorView(textViewAccordingly),
+				createDefaultSeparatorView(textViewAccordingly)
+			};
+			/// although it is invisible, the position is useful for later animator
+			textViewAccordingly.setX(columnPosition);
+			textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
+			textViewAccordingly.setSeparatorViews(m_layoutParagraph, Arrays.asList(separatorViews));
+			separatorViews[0].setText(phrase.getSeparatorString());
+			separatorViews[1].setText(phrase.getRemainingString());
+			separatorViews[1].setBackgroundResource(R.drawable.bg_text_separator_right);
+			if (AnimatorTool.animatePhraseView(separatorViews[0], columnPosition,
+				lineNumber * Phrase.LINE_HEIGHT)) {    /// this checks if animator is necessary
+				AnimatorTool.animatePhraseView(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT);
+			} else {
+				separatorViews[1].setX(0);
+				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
+			}
 //				separatorViews[0].setX(columnPosition);
 //				separatorViews[0].setY(lineNumber * Phrase.LINE_HEIGHT);
 //				separatorViews[1].setX(0);
 //				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
-			} else {
-				/// no line separator
-				textViewAccordingly.clearSeparatorViews(m_layoutParagraph);
-				textViewAccordingly.setVisibility(View.VISIBLE);
-				AnimatorTool.animatePhraseView(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
+		} else {
+			/// no line separator
+			textViewAccordingly.clearSeparatorViews(m_layoutParagraph);
+			textViewAccordingly.setVisibility(View.VISIBLE);
+			AnimatorTool.animatePhraseView(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
 //				textViewAccordingly.setX(columnPosition);
 //				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
-			}
 		}
 	}
 

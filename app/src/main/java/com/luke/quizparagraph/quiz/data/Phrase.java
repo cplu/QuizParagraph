@@ -20,6 +20,7 @@ public class Phrase {
 	private final int m_originalIndex;  /// original index in input List<String>
 	private final int m_width;         /// width of this phrase
 	private final List<Word> m_wordSet;   /// word set of this phrase
+	private final String m_originalString;  /// original String, the raw String from input
 
 	/// all following fields are temporarily set when parsing a paragraph
 	private int m_separatingPosition = NO_SEPARATING;   /// temporary separating position in m_wordSet, NO_SEPARATING means no separating at this phrase
@@ -29,8 +30,9 @@ public class Phrase {
 	private String m_remainingString;   /// remaining string after separating position (temporarily)
 	private int m_remainingWidth;       /// remaining width after separating position (temporarily)
 
-	public Phrase(int originalIndex, List<Word> wordSet) {
+	public Phrase(String originalString, int originalIndex, List<Word> wordSet) {
 //		m_originalIndex = originalIndex;
+		m_originalString = originalString;
 		int width = 0;
 		/// calculate length of all words
 		for (Word word : wordSet) {
@@ -221,5 +223,9 @@ public class Phrase {
 	private boolean isPointNear(float x1, float y1, float x2, float y2) {
 		return Math.abs(x1 - x2) < POINT_NEAR_LIMIT
 		       && Math.abs(y1 - y2) < POINT_NEAR_LIMIT;
+	}
+
+	public String getOriginalString() {
+		return m_originalString;
 	}
 }

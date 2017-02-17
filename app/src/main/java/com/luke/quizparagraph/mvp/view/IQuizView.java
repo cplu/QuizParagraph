@@ -14,7 +14,22 @@ public interface IQuizView extends IActivityView {
 		public void notifyPhraseResult(List<Phrase> parsedResult) {
 
 		}
+
+		@Override
+		public void notifyPhraseAdded(Phrase phrase) {
+
+		}
 	};
 
+	/**
+	 * notify all phrases to ui
+	 * @param parsedResult
+	 */
 	void notifyPhraseResult(List<Phrase> parsedResult);
+
+	/**
+	 * notify phrase added to paragraph (added to last)
+	 * @param phrase
+	 */
+	void notifyPhraseAdded(Phrase phrase);
 }

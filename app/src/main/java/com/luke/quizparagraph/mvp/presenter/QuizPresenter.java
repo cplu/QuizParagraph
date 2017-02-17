@@ -92,9 +92,10 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 		/// iterate by index, we need to use index to keep original indexes
 		for (int i = 0; i < phraseStringList.size(); i++) {
 			String phraseString = phraseStringList.get(i);
+			phraseString = phraseString.trim();
 			if (!TextUtils.isEmpty(phraseString) && phraseString.length() <= lineWidth) {
 				List<Word> wordSet = createWordSetByStringSet(phraseString, paint);
-				phraseList.add(new Phrase(i, wordSet));
+				phraseList.add(new Phrase(phraseString, i, wordSet));
 			} else {
 				/// invalid input string (empty or null), should bypass, meaning that index in m_phraseParagraph needn't be consecutive
 			}
@@ -103,7 +104,7 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 	}
 
 	private List<Word> createWordSetByStringSet(String phraseString, Paint paint) {
-		String[] wordStringSet = phraseString.split(" +");
+		String[] wordStringSet = phraseString.trim().split(" +");
 		List<Word> wordList = new ArrayList<>();
 		for (String wordString : wordStringSet) {
 			Word word = new Word(wordString, (int) Math.ceil(paint.measureText(wordString + Phrase.SPACE_STRING)));
@@ -120,11 +121,13 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 	 * @return true if successfull, false otherwise
 	 */
 	public boolean addPhrase(String phraseString, Paint paint, int lineWidth) {
+		phraseString = phraseString.trim();
 		if (!TextUtils.isEmpty(phraseString) && paint.measureText(phraseString) < lineWidth) {
 			List<Word> wordSet = createWordSetByStringSet(phraseString, paint);
 			int phraseCount = m_paragraph.getPhraseCount();
-			Phrase phrase = new Phrase(phraseCount, wordSet);
+			Phrase phrase = new Phrase(phraseString, phraseCount, wordSet);
 			m_paragraph.addPhrase(phrase);
+			getView().notifyPhraseAdded(phrase);
 			return true;
 		} else {
 			return false;
