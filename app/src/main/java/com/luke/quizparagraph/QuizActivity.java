@@ -1,5 +1,6 @@
 package com.luke.quizparagraph;
 
+import android.animation.AnimatorSet;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 	private Paint m_txtPaint;
 	private PhraseTextView m_textViewSelectedPhrase;
 	private PhraseTextView m_textViewDottyPhrase;  /// show selected Phrase with dot slash border
+//	private AnimatorSet m_animatorSet = new AnimatorSet();  /// used for organizing animators, and for easily cancelled
 
 	@Override
 	protected QuizPresenter createPresenter() {
@@ -174,6 +176,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 		int lineNumber = phrase.getLineNumber();
 		int columnPosition = phrase.getColumnPosition();
 		int separatorIndex = phrase.getSeparatingPosition();
+
 		if (separatorIndex != Phrase.NO_SEPARATING) {
 			/// line separator, create separator views and show
 			textViewAccordingly.setVisibility(View.GONE);
@@ -188,16 +191,19 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 			textViewAccordingly.setSeparatorViews(m_layoutParagraph, Arrays.asList(separatorViews));
 			separatorViews[0].setText(phrase.getSeparatorString());
 			separatorViews[1].setText(phrase.getRemainingString());
-			if(dotty) {
+			if (dotty) {
 //				textViewAccordingly.setText(phrase.getOriginalString());
 				separatorViews[0].setBackgroundResource(R.drawable.bg_text_separator_left_dot);
 				separatorViews[1].setBackgroundResource(R.drawable.bg_text_separator_right_dot);
 			} else {
 				separatorViews[1].setBackgroundResource(R.drawable.bg_text_separator_right);
 			}
-			if (AnimatorTool.animatePhraseView(separatorViews[0], columnPosition,
-				lineNumber * Phrase.LINE_HEIGHT)) {    /// this checks if animator is necessary
-				AnimatorTool.animatePhraseView(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT);
+			AnimatorSet phraseAnimator = AnimatorTool.getDefaultAnimator(separatorViews[0], columnPosition,
+				lineNumber * Phrase.LINE_HEIGHT);
+			if (phraseAnimator != null) {    /// this checks if animator is necessary
+				phraseAnimator.start();
+				AnimatorTool.getDefaultAnimator(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT)
+					.start();
 			} else {
 				separatorViews[1].setX(0);
 				separatorViews[1].setY((lineNumber + 1) * Phrase.LINE_HEIGHT);
@@ -210,7 +216,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 			/// no line separator
 			textViewAccordingly.clearSeparatorViews(m_layoutParagraph);
 			textViewAccordingly.setVisibility(View.VISIBLE);
-			AnimatorTool.animatePhraseView(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
+			AnimatorTool.startPhraseViewAnimator(textViewAccordingly, columnPosition, lineNumber * Phrase.LINE_HEIGHT);
 //				textViewAccordingly.setX(columnPosition);
 //				textViewAccordingly.setY(lineNumber * Phrase.LINE_HEIGHT);
 		}

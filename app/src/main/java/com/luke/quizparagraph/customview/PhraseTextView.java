@@ -1,5 +1,6 @@
 package com.luke.quizparagraph.customview;
 
+import android.animation.AnimatorSet;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public class PhraseTextView extends TextView {
 	private List<TextView> m_separatorViews = new ArrayList<>();    /// used for line separating
+	private AnimatorSet m_phraseAnimator;
 
 	public PhraseTextView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -32,5 +34,15 @@ public class PhraseTextView extends TextView {
 			parentView.removeView(separatorView);
 		}
 //		m_separatorViews.clear();
+	}
+
+	public void setAnimator(AnimatorSet animatorSet) {
+		m_phraseAnimator = animatorSet;
+	}
+
+	public void cancelAnimator() {
+		if(m_phraseAnimator != null) {
+			m_phraseAnimator.cancel();
+		}
 	}
 }
