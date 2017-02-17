@@ -221,7 +221,6 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 			getResources().getStringArray(R.array.default_phrase)
 		);
 		m_phraseItemViews.clear();
-		m_layoutParagraph.removeAllViews();
 		for (int i = 0; i < phraseStringList.size(); i++) {
 			PhraseTextView txtView = createDefaultPhraseTextView();
 			txtView.setText(phraseStringList.get(i));
@@ -233,6 +232,8 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 	}
 
 	private void prepare() {
+		m_layoutParagraph.removeAllViews();
+
 		m_textViewDottyPhrase = createDefaultPhraseTextView();
 		m_layoutParagraph.addView(m_textViewDottyPhrase);
 		m_textViewDottyPhrase.setVisibility(View.INVISIBLE);   /// hide as default
