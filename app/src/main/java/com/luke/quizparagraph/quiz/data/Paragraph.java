@@ -129,7 +129,8 @@ public class Paragraph {
 		}
 		if(newIndex == -1) {
 			/// try to add to the last position
-			if(m_phraseParagraph.getLast().above(x, y)) {
+			Phrase lastPhrase = m_phraseParagraph.getLast();
+			if(lastPhrase != null && lastPhrase.above(x, y)) {
 				newIndex = m_phraseParagraph.size();
 			}
 		}
