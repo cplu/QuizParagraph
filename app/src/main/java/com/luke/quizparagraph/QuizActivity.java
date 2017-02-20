@@ -202,8 +202,10 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 				lineNumber * Phrase.LINE_HEIGHT);
 			if (phraseAnimator != null && !dotty) {    /// this checks if animator is necessary, dotty view doesn't need animator
 				phraseAnimator.start();
-				AnimatorTool.getDefaultAnimator(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT)
-					.start();
+				AnimatorSet defaultAnimator = AnimatorTool.getDefaultAnimator(separatorViews[1], 0, (lineNumber + 1) * Phrase.LINE_HEIGHT);
+				if(defaultAnimator != null) {
+					defaultAnimator.start();
+				}
 			} else {
 				separatorViews[0].setX(columnPosition);
 				separatorViews[0].setY(lineNumber * Phrase.LINE_HEIGHT);
