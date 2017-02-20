@@ -37,10 +37,10 @@ public class AnimatorTool {
 	}
 
 	public static AnimatorSet getDefaultAnimator(View view, float x, float y) {
-		if(view.getX() == x && view.getY() == y) {
-			/// same position, no animation at all
-			return null;
-		}
+//		if(view.getX() == x && view.getY() == y) {
+//			/// same position, no animation at all
+//			return null;
+//		}
 		ObjectAnimator animatorX = ObjectAnimator.ofFloat(view, "x", view.getX(), x);
 		ObjectAnimator animatorY = ObjectAnimator.ofFloat(view, "y", view.getY(), y);
 		AnimatorSet animatorSet = new AnimatorSet();

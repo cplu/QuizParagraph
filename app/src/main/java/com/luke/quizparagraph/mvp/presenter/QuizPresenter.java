@@ -9,8 +9,6 @@ import com.luke.quizparagraph.quiz.data.Paragraph;
 import com.luke.quizparagraph.quiz.data.Phrase;
 import com.luke.quizparagraph.quiz.data.Word;
 
-import org.pmw.tinylog.Logger;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -70,7 +68,7 @@ public class QuizPresenter extends ActivityPresenter<IQuizView> {
 			return;
 		}
 		if (m_paragraph.movePhraseByPosition(x, y, m_phraseToMove)) {
-			Logger.debug("resolve phrase move ");
+//			Logger.debug("resolve phrase move ");
 			getView().notifyPhraseResult(m_paragraph.getPhraseList());
 		}
 	}

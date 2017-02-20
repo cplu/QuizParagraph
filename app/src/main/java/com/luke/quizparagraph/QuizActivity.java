@@ -118,7 +118,7 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 					float currentPhrasePositionX = event.getX() - m_selectedPhrasePosRelativeToTouch.x;
 					float currentPhrasePositionY = event.getY() - m_selectedPhrasePosRelativeToTouch.y;
 					if(!isPointNearLastPos(currentPhrasePositionX, currentPhrasePositionY)) {
-						Logger.debug("phrase action move");
+//						Logger.debug("phrase action move");
 						m_lastMovePosX = currentPhrasePositionX;
 						m_lastMovePosY = currentPhrasePositionY;
 						m_textViewSelectedPhrase.setX(currentPhrasePositionX);
