@@ -93,6 +93,10 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 	}
 
 	private PointF m_selectedPhrasePosRelativeToTouch = new PointF();
+	private static final float PHRASE_MOVE_NEAR_LIMIT = 2;
+	private static final float MOVE_POSITION_INVALID_VALUE = Float.MIN_VALUE;
+	private float m_lastMovePosX = MOVE_POSITION_INVALID_VALUE;
+	private float m_lastMovePosY = MOVE_POSITION_INVALID_VALUE;
 
 	@OnTouch(R.id.layout_paragraph_main)
 	public boolean onLayoutParagraphTouch(MotionEvent event) {
@@ -113,9 +117,14 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 				if (m_textViewSelectedPhrase != null) {
 					float currentPhrasePositionX = event.getX() - m_selectedPhrasePosRelativeToTouch.x;
 					float currentPhrasePositionY = event.getY() - m_selectedPhrasePosRelativeToTouch.y;
-					m_textViewSelectedPhrase.setX(currentPhrasePositionX);
-					m_textViewSelectedPhrase.setY(currentPhrasePositionY);
-					m_presenter.movePhraseByPosition(currentPhrasePositionX, currentPhrasePositionY);
+					if(!isPointNearLastPos(currentPhrasePositionX, currentPhrasePositionY)) {
+						Logger.debug("phrase action move");
+						m_lastMovePosX = currentPhrasePositionX;
+						m_lastMovePosY = currentPhrasePositionY;
+						m_textViewSelectedPhrase.setX(currentPhrasePositionX);
+						m_textViewSelectedPhrase.setY(currentPhrasePositionY);
+						m_presenter.movePhraseByPosition(currentPhrasePositionX, currentPhrasePositionY);
+					}
 				}
 				break;
 			case MotionEvent.ACTION_UP:
@@ -125,11 +134,19 @@ public class QuizActivity extends MVPActivity<IQuizView, QuizPresenter>
 					m_textViewSelectedPhrase = null;
 					m_presenter.dockPhrase();
 				}
+
+				m_lastMovePosX = MOVE_POSITION_INVALID_VALUE;
+				m_lastMovePosY = MOVE_POSITION_INVALID_VALUE;
 				break;
 			default:
 				break;
 		}
 		return super.onTouchEvent(event);
+	}
+
+	private boolean isPointNearLastPos(float x, float y) {
+		return Math.abs(x - m_lastMovePosX) < PHRASE_MOVE_NEAR_LIMIT
+		       && Math.abs(y - m_lastMovePosY) < PHRASE_MOVE_NEAR_LIMIT;
 	}
 
 	private void clearPhraseSelected() {

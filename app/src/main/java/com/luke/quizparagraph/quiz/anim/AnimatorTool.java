@@ -7,6 +7,8 @@ import android.view.animation.LinearInterpolator;
 
 import com.luke.quizparagraph.customview.PhraseTextView;
 
+import org.pmw.tinylog.Logger;
+
 /**
  * Created by cplu on 2017/2/17.
  */
@@ -29,6 +31,7 @@ public class AnimatorTool {
 		}
 		view.cancelAnimator();
 		view.setAnimator(animatorSet);
+		Logger.debug("start a phrase animator to " + x + " " + y);
 		animatorSet.start();
 		return animatorSet;
 	}

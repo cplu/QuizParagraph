@@ -42,7 +42,7 @@ public class PhraseTextView extends TextView {
 
 	public void cancelAnimator() {
 		if(m_phraseAnimator != null) {
-			m_phraseAnimator.cancel();
+			m_phraseAnimator.end();
 		}
 	}
 }
